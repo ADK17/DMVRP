@@ -2,31 +2,23 @@ package com.ADK.utils;
 
 import java.io.*;
 
-/*
- */
 public class Reader {
 
 	int count;
-	String inputFileName;
-	String outputFileName;
 
-	/** Creates a new instance of Reader */
-	public Reader(String inputFileName, String outputFileName) {
-		System.out.println("Constructor");
-		this.inputFileName = inputFileName;
-		this.outputFileName = outputFileName;
+	public Reader(){
 		count = 0;
 	}
 
-	public String readFile() {
+	public void readFile(String inputFile, String outputFile) {
 		try {
 			String str;
-			BufferedReader reader = new BufferedReader(new FileReader(inputFileName));
+			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
 			int temp = 0;
 			while ((str = reader.readLine()) != null) {
 				++temp;
 				if (temp > count) {
-					String filePath = outputFileName;
+					String filePath = outputFile;
 					BufferedWriter WriteFile = new BufferedWriter(new FileWriter(filePath, true));
 					WriteFile.write(str);
 					WriteFile.write("\n");
@@ -40,19 +32,41 @@ public class Reader {
 		} catch (Exception e) {
 			System.out.println(e + " in readFile()");
 		}
-		return "lala";
 	}
+	
+	public String readOnly(String inputFile){
+		
+		StringBuffer stringBuffer = new StringBuffer();
+		try {
+			String str, output;
+			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+			int temp = 0;
+			while ((str = reader.readLine()) != null) {
+				++temp;
+				if (temp > count) {
+					stringBuffer.append(str);
+					stringBuffer.append("\n");
+				}
+			}
+			count = temp;
+			reader.close();
 
+		} catch (Exception e) {
+			System.out.println(e + " in readFile()");
+		}
+		return stringBuffer.toString();
+	}
+	
 	/**
 	 * @param args
 	 *            the command line arguments
 	 */
 	public static void main(String[] args) {
 		try {
-			Reader reader = new Reader("sample.txt","sampleout.txt");
+			Reader reader = new Reader();
 			for (int i = 1; i < 3; ++i) {
 				Thread.sleep(10000);
-				reader.readFile();
+//				reader.readFile();
 			}
 		} catch (Exception e) {
 			System.out.println(e + " in reader main()");

@@ -6,30 +6,23 @@ import java.io.*;
 public class Writer {
 
 	int count;
-	String fileName;
 
 	/** Creates a new instance of writer */
-	public Writer(String fileName) {
+	public Writer() {
 
 		try {
-			// String pathname = "SharedFile";
-			// File SharedFile = new File(pathname);
-			// FileWriter SFile = new FileWriter(SharedFile);
-			// SFile.close();
 			count = 0;
-			this.fileName = fileName;
-
 		} catch (Exception e) {
 			System.out.println(e + "in writer");
 		}
 	}
 
-	void writeFile(String data) {
+	public void writeFile(String data, String fileName) {
 		try {
-			String str = "Count " + count;
+			//String str = "Count " + count;
 			String filePath = fileName;
 			BufferedWriter WriteFile = new BufferedWriter(new FileWriter(filePath, true));
-			WriteFile.write(str);
+			WriteFile.write(data);
 			WriteFile.write("\n");
 			WriteFile.close();
 			count++;
@@ -45,10 +38,10 @@ public class Writer {
 	 */
 	public static void main(String[] args) {
 		try {
-			Writer writer = new Writer("sampleout.txt");
+			Writer writer = new Writer();
 			for (int i = 1; i < 5; ++i) {
 				Thread.sleep(10000);
-				writer.writeFile("lala");
+			//	writer.writeFile("lala");
 			}
 		} catch (Exception e) {
 			System.out.println(e + " in writer main()");

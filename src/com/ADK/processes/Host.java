@@ -4,7 +4,7 @@ import com.ADK.utils.Reader;
 import com.ADK.utils.Writer;
 
 public class Host {
-	
+
 	int id;
 	int lanID;
 	String type;
@@ -16,6 +16,7 @@ public class Host {
 	Reader reader;
 	Writer writer;
 	
+
 	public Host(int id, int lanID, String type, int tts, int period) {
 		super();
 		this.id = id;
@@ -23,48 +24,56 @@ public class Host {
 		this.type = type;
 		this.tts = tts;
 		this.period = period;
-		this.outFile="hout"+id+".txt";
-		this.inLANFile="lan"+lanID+".txt";
-		this.inFile="hin"+id+".txt";
-		reader = new Reader(inLANFile,inFile);
-		writer = new Writer(outFile);
+		this.outFile = "hout" + id + ".txt";
+		this.inLANFile = "lan" + lanID + ".txt";
+		this.inFile = "hin" + id + ".txt";
+		reader = new Reader();
+		writer = new Writer();
+		startHost();
 	}
-	
-	public void startHost(){
-		if(this.type=="receiver"){
+
+	public void startHost() {
+		if (this.type.equals("receiver")) {
 			startReceiver();
-		}
-		else if(this.type=="sender"){
+		} else if (this.type.equals("sender")) {
 			startSender();
 		}
 	}
-	
-	private void startSender(){
+
+	private void startSender() {
 		try {
-			Thread.sleep(tts*1000);
-			while(true){
-				
+			System.out.println("Starting Sender "+id);
+			Thread.sleep(tts * 1000);
+			while (true) {
+				writer.writeFile("data "+ lanID +" " +lanID, outFile);
+				System.out.println("Data written to file");
+				Thread.sleep(period * 1000);
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	private void startReceiver(){
-		
+
+	private void startReceiver() {
+		System.out.println("Starting Receiver "+id);
 		try {
-			Thread.sleep(1000);
-			reader.readFile();
-			
-		} catch (InterruptedException e) {	
+			while(true){
+				Thread.sleep(1000);
+				reader.readFile(inLANFile, inFile);
+				System.out.println("Read data");
+			}
+
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	public static void main(String args[]){
-		Host host = new Host(1, 2, "receiver", 0, 0);
-		host.startHost();
+
+	public static void main(String args[]) {
+		// host-id lan-id type time-to-start period
+		Host host = new Host(Integer.parseInt(args[0]), Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]),
+				Integer.parseInt(args[4]));
+
 	}
 }
