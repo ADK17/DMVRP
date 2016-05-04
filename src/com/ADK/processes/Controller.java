@@ -46,23 +46,22 @@ public class Controller {
 				Thread.sleep(10000);
 				for(int i=0;i<hosts.size();i++){
 					content = hostReaders.get(i).readOnly("hout"+hosts.get(i)+".txt");
-					parseHostMessage(content);				
+					parseMessage(content);				
 				}
-//				for(int i=0;i<routers.size();i++){
-//					content = routerReaders.get(i).readOnly("rout"+routers.get(i)+".txt");
-//					parseRouterMessage(content);
-//				}
+				for(int i=0;i<routers.size();i++){
+					content = routerReaders.get(i).readOnly("rout"+routers.get(i)+".txt");
+					parseMessage(content);
+				}
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 	
-	private void parseHostMessage(String message){
+	private void parseMessage(String message){
 		
 		String[] messages = message.split("\n");
 		if(messages[0].equals("")){
-			//System.out.println("No new messages");
 			return;
 		}
 		
@@ -70,12 +69,10 @@ public class Controller {
 			String[] currentMessage = messages[i].split(" ");			
 			int destLanID = Integer.parseInt(currentMessage[1]);
 			writer.writeFile(messages[i], "lan"+destLanID+".txt");
-			System.out.println("Message written by Controller from Host to LAN"+destLanID);
+			//System.out.println("Message written by Controller to LAN "+destLanID);
 		}
 	}
-	private void parseRouterMessage(String message){
-		
-	}
+	
 	
 	public static void main(String[] args){
 		//"host" id id id . . . id "router" id id . . . id "lan" id id . .  . id
