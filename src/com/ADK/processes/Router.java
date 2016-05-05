@@ -143,10 +143,16 @@ public class Router {
 		int sourceLANID = Integer.parseInt(message[1]);
 		int sourceRouterID = Integer.parseInt(message[2]);
 		int lanIndex = 0;
+		
+		if(id == sourceRouterID){
+			System.out.println("Router "+id+" ignoring self DV message from LAN "+ sourceLANID);
+			return;
+		}
 
 		routingTable.get(sourceLANID).hopCount = 0;
-		routingTable.get(sourceLANID).nextHopRouter = Math.min(sourceRouterID,
-				routingTable.get(sourceLANID).nextHopRouter);
+//		routingTable.get(sourceLANID).nextHopRouter = Math.min(sourceRouterID,
+//				routingTable.get(sourceLANID).nextHopRouter);
+		routingTable.get(sourceLANID).nextHopRouter = id;
 		routingTable.get(sourceLANID).childMap[sourceLANID] = 0;
 
 		for (int i = 3; i < message.length - 1; i++) {
@@ -194,7 +200,7 @@ public class Router {
 		}
 		for (int i = 0; i < lanIDs.size(); i++) {
 			StringBuffer message = new StringBuffer();
-			message.append("DV ").append(String.valueOf(lanIDs.get(i))).append(sb);
+			message.append("DV ").append(String.valueOf(lanIDs.get(i))).append(" ").append(id).append(sb);
 			writer.writeFile(message.toString(), inFile);
 			System.out.println("Router " + id + " sent DV message");
 		}
@@ -228,14 +234,18 @@ public class Router {
 		int hopCount;
 		int nextHopRouter;
 		int[] childMap;
+		int[] leafMap;
 
 		public TableEntry(int hopCount, int nextHopRouter) {
 			super();
 			this.hopCount = hopCount;
 			this.nextHopRouter = nextHopRouter;
 			childMap = new int[10];
-			for (int i = 0; i < 10; i++)
+			leafMap = new int[10];
+			for (int i = 0; i < 10; i++){
 				childMap[i] = 1;
+				leafMap[i] = 0;
+			}
 		}
 
 	}
