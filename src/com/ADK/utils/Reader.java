@@ -10,7 +10,7 @@ public class Reader {
 		count = 0;
 	}
 
-	public void readFile(String inputFile, String outputFile) {
+	public void readFile(String inputFile, String outputFile, String type) {
 		try {
 			String str;
 			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
@@ -18,6 +18,8 @@ public class Reader {
 			while ((str = reader.readLine()) != null) {
 				++temp;
 				if (temp > count) {
+					if(type == "receiver" && (str.startsWith("DV") || str.startsWith("receiver")))
+						continue;
 					String filePath = outputFile;
 					BufferedWriter WriteFile = new BufferedWriter(new FileWriter(filePath, true));
 					WriteFile.write(str);

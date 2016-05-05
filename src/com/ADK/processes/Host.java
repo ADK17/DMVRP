@@ -65,7 +65,7 @@ public class Host {
 		try {
 			while(endTime - startTime<100000){
 				Thread.sleep(5000);
-				reader.readFile(inLANFile, inFile);
+				reader.readFile(inLANFile, inFile,"receiver");
 				System.out.println("Receiver "+id+" read data from its LAN file "+inLANFile);
 				count++;
 				if(count==10){
