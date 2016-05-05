@@ -1,6 +1,7 @@
 package com.ADK.processes;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.ADK.utils.Reader;
@@ -25,13 +26,31 @@ public class Controller {
 		
 		for(int i=0;i<hosts.size();i++){
 			hostReaders.add(new Reader());
+			File file = new File("hout"+hosts.get(i)+".txt");
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}		
 		}
 		for(int i=0;i<routers.size();i++){
 			routerReaders.add(new Reader());
+			File file = new File("rout"+routers.get(i)+".txt");
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 		}
 		
 		for(int i=0;i<lans.size();i++){
 			File file = new File("lan"+lans.get(i)+".txt");
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		writer = new Writer();
@@ -41,17 +60,22 @@ public class Controller {
 	public void startController(){
 			String content;
 			System.out.println("Starting Controller");
+			Long startTime = System.currentTimeMillis();
+			Long endTime = System.currentTimeMillis();
 			try {
-				while(true){
+				while(endTime - startTime<100000){
 				Thread.sleep(10000);
 				for(int i=0;i<hosts.size();i++){
 					content = hostReaders.get(i).readOnly("hout"+hosts.get(i)+".txt");
-					parseMessage(content);				
+					parseMessage(content);		
+					System.out.println("Message written by Controller from Host "+hosts.get(i)+" to LAN");
 				}
 				for(int i=0;i<routers.size();i++){
 					content = routerReaders.get(i).readOnly("rout"+routers.get(i)+".txt");
 					parseMessage(content);
+					System.out.println("Message written by Controller from Router "+routers.get(i)+" to LAN ");
 				}
+				endTime = System.currentTimeMillis();
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -69,7 +93,7 @@ public class Controller {
 			String[] currentMessage = messages[i].split(" ");			
 			int destLanID = Integer.parseInt(currentMessage[1]);
 			writer.writeFile(messages[i], "lan"+destLanID+".txt");
-			//System.out.println("Message written by Controller to LAN "+destLanID);
+			
 		}
 	}
 	

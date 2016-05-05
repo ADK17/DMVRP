@@ -64,10 +64,6 @@ public class Reader {
 	public static void main(String[] args) {
 		try {
 			Reader reader = new Reader();
-			for (int i = 1; i < 3; ++i) {
-				Thread.sleep(10000);
-//				reader.readFile();
-			}
 		} catch (Exception e) {
 			System.out.println(e + " in reader main()");
 		}

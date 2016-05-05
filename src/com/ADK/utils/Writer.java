@@ -20,8 +20,8 @@ public class Writer {
 	public void writeFile(String data, String fileName) {
 		try {
 			//String str = "Count " + count;
-			String filePath = fileName;
-			BufferedWriter WriteFile = new BufferedWriter(new FileWriter(filePath, true));
+			//String filePath = fileName;
+			BufferedWriter WriteFile = new BufferedWriter(new FileWriter(fileName, true));
 			WriteFile.write(data);
 			WriteFile.write("\n");
 			WriteFile.close();
@@ -39,10 +39,6 @@ public class Writer {
 	public static void main(String[] args) {
 		try {
 			Writer writer = new Writer();
-			for (int i = 1; i < 5; ++i) {
-				Thread.sleep(10000);
-			//	writer.writeFile("lala");
-			}
 		} catch (Exception e) {
 			System.out.println(e + " in writer main()");
 		}

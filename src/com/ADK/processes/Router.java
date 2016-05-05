@@ -14,6 +14,7 @@ public class Router {
 	HashMap<Integer, TableEntry> routingTable;
 	String inFile;
 	Writer writer;
+	Long[] receiverTracker;
 
 	public Router(int id, ArrayList<Integer> lanIDs) {
 
@@ -21,39 +22,65 @@ public class Router {
 		this.id = id;
 		this.lanIDs = lanIDs;
 		this.inFile = "rout" + id + ".txt";
+		receiverTracker = new Long[10];
+		writer = new Writer();
 		routingTable = new HashMap<>();
 		readers = new ArrayList<>();
 
 		for (int i = 0; i < lanIDs.size(); i++) {
 			readers.add(new Reader());
-			TableEntry entry = new TableEntry(10, 10);
-			routingTable.put(lanIDs.get(i), entry);
 		}
-
+		for(int i=0;i<10;i++){
+			TableEntry entry = new TableEntry(10, 10);
+			routingTable.put(i, entry);
+			receiverTracker[i]=(long) 0;
+		}
+		
 		startRouter();
 	}
 
 	private void startRouter() {
-		int count = 0;
+		int count1 = 0, count2=0;
 		System.out.println("Starting Router " + id);
+		Long startTime = System.currentTimeMillis();
+		Long endTime = System.currentTimeMillis();
 		//TODO Send NMR messages every 10 secs if receiver stops sending receiver messages
 		//TODO Check if a child router has stopped sending NMR messages
 		try {
-			while (true) {
-				Thread.sleep(10000);
+			while (endTime - startTime<100000) {
+				Thread.sleep(1000);
 				readLANFiles();
-				count++;
-				if (count == 5) {
-					count = 0;
+				//checkReceiverTimeout();
+				count1++;
+				count2++;
+				if (count1 == 5) {
+					count1 = 0;
 					sendDVMessage();
 				}
+				if(count2==10){
+					count2=0;
+					//sendNMRMessages();
+				}
+				endTime = System.currentTimeMillis();
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
 	}
+	
+	private void checkReceiverTimeout(){
+		Long currentTime = System.currentTimeMillis();
+		for(int i=0;i<receiverTracker.length;i++){
+			if(receiverTracker[i]>0 && currentTime-receiverTracker[i]>20000){
+				
+			}
+		}
+	}
 
+	private void sendNMRMessages(){
+		
+	}
 	private void readLANFiles() {
 
 		for (int i = 0; i < lanIDs.size(); i++) {
@@ -75,16 +102,16 @@ public class Router {
 					handleMembershipMessage(lanIDs.get(i));
 					break;
 				case "DV":
+					//System.out.println(messages[j]);
 					handleDVMessage(currentMessage);
 					break;
-
 				case "NMR":
 					handleNMRMessage(currentMessage);
 					break;
 				}
 			}
 		}
-		System.out.println("Read from adjacent LANs");
+		System.out.println("Router "+id+" read from adjacent LANs");
 	}
 
 	private void handleDataMessage(String[] message, int incomingLANID) {
@@ -93,7 +120,7 @@ public class Router {
 			int outgoingLANID = lanIDs.get(i);
 			if (incomingLANID != outgoingLANID && routingTable.get(outgoingLANID).hopCount == 0) {
 				String temp = message[1];
-				message[1] = "lan" + outgoingLANID;
+				message[1] = String.valueOf(outgoingLANID);
 				String messageToSend = joinString(message);
 				message[1] = temp;
 				writer.writeFile(messageToSend, inFile);
@@ -102,9 +129,10 @@ public class Router {
 	}
 
 	private void handleDVMessage(String[] message) {
-
+		
 		int sourceLANID = Integer.parseInt(message[1]);
 		int sourceRouterID = Integer.parseInt(message[2]);
+		int lanIndex = 0;
 
 		routingTable.get(sourceLANID).hopCount = 0;
 		routingTable.get(sourceLANID).nextHopRouter = Math.min(sourceRouterID,
@@ -114,6 +142,15 @@ public class Router {
 			int currentHopCount = Integer.parseInt(message[i]);
 			i++;
 			int currentNextHopRouter = Integer.parseInt(message[i]);
+			if(routingTable.get(lanIndex).hopCount>currentHopCount+1){
+				routingTable.put(lanIndex, new TableEntry(currentHopCount+1, sourceRouterID));
+			}
+			else if(routingTable.get(lanIndex).hopCount==currentHopCount+1){
+				if(routingTable.get(lanIndex).nextHopRouter>currentNextHopRouter){
+					routingTable.put(lanIndex, new TableEntry(currentHopCount+1, sourceRouterID));
+				}
+			}
+			lanIndex++;
 		}
 	}
 
@@ -125,7 +162,7 @@ public class Router {
 	}
 
 	private void handleMembershipMessage(int lanID) {
-		// TODO receiver timing?
+		receiverTracker[lanID] = System.currentTimeMillis();
 		routingTable.get(lanID).hopCount = 0;
 		routingTable.get(lanID).nextHopRouter = id;
 	}
@@ -135,12 +172,13 @@ public class Router {
 		StringBuffer sb = new StringBuffer();
 		for (Integer lanID : routingTable.keySet()) {
 			TableEntry entry = routingTable.get(lanID);
-			sb.append(" ").append(entry.hopCount).append(" ").append(entry.nextHopRouter);
+			sb.append(" ").append(String.valueOf(entry.hopCount)).append(" ").append(String.valueOf(entry.nextHopRouter));
 		}
 		for (int i = 0; i < lanIDs.size(); i++) {
 			StringBuffer message = new StringBuffer();
-			message.append("DV ").append(lanIDs.get(i)).append(" ").append(sb);
+			message.append("DV ").append(String.valueOf(lanIDs.get(i))).append(sb);
 			writer.writeFile(message.toString(), inFile);
+			System.out.println("Router "+id+" sent DV message");
 		}
 	}
 
@@ -163,7 +201,7 @@ public class Router {
 		for (int i = 1; i <= length; i++) {
 			lanIDS.add(Integer.parseInt(args[i]));
 		}
-		Router router = new Router(1, lanIDS);
+		Router router = new Router(routerID, lanIDS);
 
 	}
 
