@@ -82,7 +82,7 @@ public class Host {
 	}
 
 	private void sendMembershipMessage(){
-		writer.writeFile("receiver "+String.valueOf(lanID), inLANFile);
+		writer.writeFile("receiver "+String.valueOf(lanID), outFile);
 		System.out.println("Receiver "+id+" sent membership message to "+inLANFile);
 	}
 	public static void main(String args[]) {
