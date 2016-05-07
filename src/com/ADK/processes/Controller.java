@@ -6,14 +6,23 @@ import java.util.ArrayList;
 
 import com.ADK.utils.Reader;
 import com.ADK.utils.Writer;
-
+/**
+ * Controller Class
+ * @author adk
+ *
+ */
 public class Controller {
-	
+	//list of hosts
 	ArrayList<Integer> hosts;
+	//list of routers
 	ArrayList<Integer> routers;
+	//list of LANS
 	ArrayList<Integer> lans;
+	//reader instances for each host
 	ArrayList<Reader> hostReaders;
+	//reader instances for each router
 	ArrayList<Reader> routerReaders;
+	//writer instance
 	Writer writer;
 
 	public Controller(ArrayList<Integer> hosts, ArrayList<Integer> routers, ArrayList<Integer> lans) {
@@ -57,19 +66,25 @@ public class Controller {
 		startController();
 	}
 	
+	/**
+	 * Starts a Controller
+	 */
 	public void startController(){
 			String content;
 			System.out.println("Starting Controller");
 			Long startTime = System.currentTimeMillis();
 			Long endTime = System.currentTimeMillis();
 			try {
+				//run for 100 secs
 				while(endTime - startTime<100000){
 				Thread.sleep(10000);
+				//read from all the host files
 				for(int i=0;i<hosts.size();i++){
 					content = hostReaders.get(i).readOnly("hout"+hosts.get(i)+".txt");
 					parseMessage(content);		
 					System.out.println("Message written by Controller from Host "+hosts.get(i)+" to LAN");
 				}
+				//read from all the router files
 				for(int i=0;i<routers.size();i++){
 					content = routerReaders.get(i).readOnly("rout"+routers.get(i)+".txt");
 					parseMessage(content);
@@ -82,6 +97,10 @@ public class Controller {
 			}
 		}
 	
+	/**
+	 * Parses a message from host or router files and forwards to LANS accordingly
+	 * @param message: incoming message
+	 */
 	private void parseMessage(String message){
 		
 		String[] messages = message.split("\n");
@@ -90,16 +109,20 @@ public class Controller {
 		}
 		
 		for(int i=0;i<messages.length;i++){
-			String[] currentMessage = messages[i].split(" ");			
+			String[] currentMessage = messages[i].split(" ");
+			//obtain destination LAN
 			int destLanID = Integer.parseInt(currentMessage[1]);
+			//write to LAN file
 			writer.writeFile(messages[i], "lan"+destLanID+".txt");
 			
 		}
 	}
 	
-	
+	/**
+	 * 
+	 * @param args "host" id id id . . . id "router" id id . . . id "lan" id id . .  . id
+	 */
 	public static void main(String[] args){
-		//"host" id id id . . . id "router" id id . . . id "lan" id id . .  . id
 		
 		int i=1;
 		ArrayList<Integer> hosts = new ArrayList<>();

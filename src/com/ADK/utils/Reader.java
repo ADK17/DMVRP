@@ -2,14 +2,28 @@ package com.ADK.utils;
 
 import java.io.*;
 
+/**
+ * Reader Class
+ *
+ */
 public class Reader {
 
 	int count;
 
-	public Reader(){
+	public Reader() {
 		count = 0;
 	}
 
+	/**
+	 * Reads new data from a file and writes it to another
+	 * 
+	 * @param inputFile:
+	 *            Input data file
+	 * @param outputFile:
+	 *            Output file
+	 * @param type:
+	 *            type of Process doing the reading
+	 */
 	public void readFile(String inputFile, String outputFile, String type) {
 		try {
 			String str;
@@ -18,7 +32,9 @@ public class Reader {
 			while ((str = reader.readLine()) != null) {
 				++temp;
 				if (temp > count) {
-					if(type == "receiver" && (str.startsWith("DV") || str.startsWith("receiver")))
+					// If it is receiver reading from LAN, ignore DV and
+					// receiver messages
+					if (type == "receiver" && (str.startsWith("DV") || str.startsWith("receiver")))
 						continue;
 					String filePath = outputFile;
 					BufferedWriter WriteFile = new BufferedWriter(new FileWriter(filePath, true));
@@ -35,9 +51,16 @@ public class Reader {
 			System.out.println(e + " in readFile()");
 		}
 	}
-	
-	public String readOnly(String inputFile){
-		
+
+	/**
+	 * Reads new data from a file and returns it
+	 * 
+	 * @param inputFile:
+	 *            Input data file
+	 * @return The data which is read
+	 */
+	public String readOnly(String inputFile) {
+
 		StringBuffer stringBuffer = new StringBuffer();
 		try {
 			String str, output;
@@ -58,16 +81,5 @@ public class Reader {
 		}
 		return stringBuffer.toString();
 	}
-	
-	/**
-	 * @param args
-	 *            the command line arguments
-	 */
-	public static void main(String[] args) {
-		try {
-			Reader reader = new Reader();
-		} catch (Exception e) {
-			System.out.println(e + " in reader main()");
-		}
-	}
+
 }
